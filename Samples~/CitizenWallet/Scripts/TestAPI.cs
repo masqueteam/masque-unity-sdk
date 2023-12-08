@@ -47,7 +47,7 @@ public class TestAPI : MonoBehaviour
 
         });
     }
-    public GameObject root_avatar;
+
     private void OnEnable()
     {
         root_web3.SetActive(false);
@@ -58,7 +58,6 @@ public class TestAPI : MonoBehaviour
         button_login.SetActive(false);
         MasqueAPI.instance.CitizenLogin((token)=> {
             print(token);
-            root_avatar.SetActive(true);
             root_web3.SetActive(true);
             button_login.SetActive(false);
         });

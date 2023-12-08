@@ -50,16 +50,19 @@ namespace MasqueSDK
 
         public void CitizenLogin(Action<string> onComplete, Action<string> onError = null)
         {
+            StopAllCoroutines();
             string url = Application.absoluteURL;
             if (string.IsNullOrEmpty(Application.absoluteURL))
             {
-                StopAllCoroutines();
                 StartCoroutine(CreateLoginSession(onComplete, onError));
             }
             else
             {
                 string mtoken = HttpUtility.ParseQueryString(new Uri(url).Query).Get("mtoken");
-                StartCoroutine(IEDecode(mtoken, onComplete, onError));
+                if(string.IsNullOrEmpty(mtoken))
+                    StartCoroutine(CreateLoginSession(onComplete, onError));
+                else
+                    StartCoroutine(IEDecode(mtoken, onComplete, onError));
             }
         }
         public void GetMyNFTs(Action<List<DataNFT>> onComplete)
