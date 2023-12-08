@@ -14,7 +14,7 @@ namespace MasqueSDK
 #if UNITY_WEBGL && !UNITY_EDITOR
         OpenURLWithCallback(url);
 #else
-            Debug.Log($"Click me: <a href={url}>{url}</a>");
+            Debug.Log($"Open Popup : {url}");
             Application.OpenURL(url);
 #endif
         }

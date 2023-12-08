@@ -55,11 +55,9 @@ public class TestAPI : MonoBehaviour
     }
     public void Login()
     {
-        button_login.SetActive(false);
         MasqueAPI.instance.CitizenLogin((token)=> {
             print(token);
             root_web3.SetActive(true);
-            button_login.SetActive(false);
         });
     }
     public void StartNFTs()

@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   importSettings:
-    nodeNameMethod: 0
+    nodeNameMethod: 1
     animationMethod: 1
     generateMipMaps: 0
     defaultMinFilterMode: 9729
