@@ -6,12 +6,12 @@
   "unity": "2020.1",
   "unityRelease": "0b5",
   "documentationUrl": "https://nextclan-masque.gitbook.io/masque/integration-guides/avatar-unity-integration",
-  "changelogUrl": "",
+  "changelogUrl": "https://nextclan-masque.gitbook.io/masque/integration-guides/avatar-unity-integration/changelog",
   "licensesUrl": "",
   "keywords": [
-    "keyword1",
-    "keyword2",
-    "keyword3"
+    "avatar",
+    "unity",
+    "sdk"
   ],
   "author": {
     "name": "Masque Team",
