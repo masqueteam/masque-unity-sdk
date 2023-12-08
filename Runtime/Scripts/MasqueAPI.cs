@@ -214,7 +214,7 @@ namespace MasqueSDK
                 }
             }
         }
-        IEnumerator IEGetMasqueId(string masqueId)
+        IEnumerator IEGetMasqueId(string masqueId, Action onComplete, Action<string> onError)
         {
             {
                 using (UnityWebRequest webRequest = UnityWebRequest.Get("https://masque-iot.adldigitalservice.com/api/v3/masque-be/masqueid/" + masqueId))
@@ -234,14 +234,17 @@ namespace MasqueSDK
                             Masque.masqueAvatarUrl = (string)json["data"]["gltf"];
                             Masque.masqueName = (string)json["data"]["name"];
                             Masque.masqueAccountAddress = (string)json["data"]["accountAddress"];
+                            onComplete.Invoke();
                         }
                         else
                         {
+                            onError?.Invoke("AccountAddress Not Found");
                             print("AccountAddress Not Found");
                         }
                     }
                     else
                     {
+                        onError?.Invoke(webRequest.error);
                         print("MasqueID Not Found");
                     }
                 }
@@ -323,9 +326,9 @@ namespace MasqueSDK
 
                     //Masque.masqueAccountAddress = accountAddress;
                     Masque.masqueId = masqueId;
-                    yield return IEGetMasqueId(masqueId);
+                    yield return IEGetMasqueId(masqueId,() => onComplete(token),onError);
 
-                    onComplete(token);
+                   
                     // Citizen.isConnect = true;
                     // loginShowIDScript.ClickButtonByMasqueId();
                 }
