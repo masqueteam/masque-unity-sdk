@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MasqueSDK
 {
-    public class MasqueLogin : MonoBehaviour
+    internal class MasqueAvatarAPI : MonoBehaviour
     {
         string apiGetindvidaID = "https://masque-dev.adldigitalservice.com/api/v3/masque-be/individualId/";
         string apiGetMasqueId = "https://masque-iot.adldigitalservice.com/api/v3/masque-be/masqueId/";
@@ -69,7 +69,7 @@ namespace MasqueSDK
         }
     }
     [System.Serializable]
-    public class CApiGetIndividualId
+    internal class CApiGetIndividualId
     {
         public string resultCode;
         public string resultDescription;
@@ -77,14 +77,14 @@ namespace MasqueSDK
 
     }
     [System.Serializable]
-    public class CApiGetMasqueId
+    internal class CApiGetMasqueId
     {
         public string resultCode;
         public string resultDescription;
         public CApiGetLoginData data;
     }
     [System.Serializable]
-    public class CApiGetLoginData
+    internal class CApiGetLoginData
     {
         public string name;
         public string masqueId;

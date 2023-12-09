@@ -4,52 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[Serializable]
-public class TokenOfOwner
-{
-    public string tokenId;
-    public string uriData;
-}
-
-[Serializable]
-public class NFTBalance
-{
-    public string balance;
-    public string tokenAddress;
-    public string name;
-    public string symbol;
-    public string icon_url;
-    public string type;
-    public TokenOfOwner[] tokenOfOwner;
-}
-
-[Serializable]
-public class NewApiResponse
-{
-    public string accountAddress;
-    public NFTBalance[] nftBalances;
-}
-
-[Serializable]
-public class NFTMetadata
-{
-    public string name;
-    public string description;
-    public string image;
-    public string gltf;
-    public Attribute[] attributes;
-    public string tokenAddress;
-}
-
-[Serializable]
-public class Attribute
-{
-    public string trait_type;
-    public string value;
-    public string display_type;
-    public string description;
-}
-
 namespace MasqueSDK
 {
     internal class APIHandlerWallet : MonoBehaviour
@@ -175,16 +129,63 @@ namespace MasqueSDK
         }
 
     }
-}
-[System.Serializable]
-public class DataNFT
-{
-    public string name;
-    public string id;
-    public string description;
-    public string tokenAddress;
+    [Serializable]
+    internal class TokenOfOwner
+    {
+        public string tokenId;
+        public string uriData;
+    }
 
-    public Attribute[] attributes;
-    public string gltf;
-    public Texture2D png;
+    [Serializable]
+    internal class NFTBalance
+    {
+        public string balance;
+        public string tokenAddress;
+        public string name;
+        public string symbol;
+        public string icon_url;
+        public string type;
+        public TokenOfOwner[] tokenOfOwner;
+    }
+
+    [Serializable]
+    internal class NewApiResponse
+    {
+        public string accountAddress;
+        public NFTBalance[] nftBalances;
+    }
+
+    [Serializable]
+    internal class NFTMetadata
+    {
+        public string name;
+        public string description;
+        public string image;
+        public string gltf;
+        public Attribute[] attributes;
+        public string tokenAddress;
+    }
+
+    [Serializable]
+    public class Attribute
+    {
+        public string trait_type;
+        public string value;
+        public string display_type;
+        public string description;
+    }
+
+    [System.Serializable]
+    public class DataNFT
+    {
+        public string name;
+        public string id;
+        public string description;
+        public string tokenAddress;
+
+        public Attribute[] attributes;
+        public string gltf;
+        public Texture2D png;
+    }
+
 }

@@ -4,26 +4,27 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[Serializable]
-public class Token
-{
-    public string balance;
-    public string tokenAddress;
-    public string name;
-    public string symbol;
-    public string icon_url;
-    public string type;
-}
-
-[Serializable]
-public class AccountData
-{
-    public string accountAddress;
-    public Token nativeBalances;
-    public Token[] tokenBalances;
-}
 namespace MasqueSDK
 {
+    [Serializable]
+    public class Token
+    {
+        public string balance;
+        public string tokenAddress;
+        public string name;
+        public string symbol;
+        public string icon_url;
+        public string type;
+    }
+
+    [Serializable]
+    public class AccountData
+    {
+        public string accountAddress;
+        public Token nativeBalances;
+        public Token[] tokenBalances;
+    }
+
     internal class APIHandlerToken : MonoBehaviour
     {
         string inquiryUrl = "https://masque-lab.adldigitalservice.com/services/citizen/nextclan/wallet/tokens/";
