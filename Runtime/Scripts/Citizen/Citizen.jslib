@@ -12,7 +12,7 @@ mergeInto(LibraryManager.library, {
         var popupWindow = window.open(
         urlString,
         "popupWindow",
-        `width=${popupWidth},height=${popupHeight},left=${popupLeft},top=${popupTop},menubar=no`
+        "width=" + popupWidth + ",height=" + popupHeight + ",left=" + popupLeft + ",top=" + popupTop + ",menubar=no"
         );
 
         /*
