@@ -18,7 +18,7 @@ namespace MasqueSDK
         public UnityEvent onLoading;
         public UnityEvent<GameObject> onComplete;
         public UnityEvent onFail;
-        public UnityEvent<string> onNameUpdate;
+        //public UnityEvent<string> onNameUpdate;
 
         public enum Mode
         {
@@ -38,7 +38,7 @@ namespace MasqueSDK
                     yield return null;
 
                 masqueAvatarUrl = Masque.masqueAvatarUrl;
-                onNameUpdate?.Invoke(Masque.masqueName);
+                //onNameUpdate?.Invoke(Masque.masqueName);
                 LoadAvatar(masqueAvatarUrl);
             }
             //else
@@ -52,10 +52,14 @@ namespace MasqueSDK
             ClearChild();
             GltfLoad(masqueAvatarUrl, transform);
         }
+
+        /*
         public void SetAvatarName(string avatarName)
         {
             onNameUpdate?.Invoke(avatarName);
         }
+        */
+
         /*
         async void GltfLoad(string url, Transform parent)
         {
@@ -204,6 +208,8 @@ namespace MasqueSDK
             {
                 if (model.transform.Find("bone_masque0_root/hips_ARI"))
                     SetupAnimator("Avatars/MasqueAvatar_ARI");
+                else if (model.transform.Find("bone_masque0_root/hips_ARI_M"))
+                    SetupAnimator("Avatars/MasqueAvatar_ARI_M");
                 else if (model.transform.Find("bone_masque0_root/hips/spine.001") || model.transform.Find("amature_masque0/hips/spine.001"))
                     SetupAnimator("Avatars/MasqueAvatar_CU");
                 else if (model.transform.Find("bone_masque0_root/mixamorig:Hips"))
