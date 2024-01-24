@@ -323,12 +323,14 @@ namespace MasqueSDK
                     JObject json = JObject.Parse(res);
                     string masqueId = json["masqueId"].ToString();
                     string accountAddress = json["accountAddress"].ToString();
-
+                    Masque.masqueAvatarUrl = json["gltf"].ToString();
+                    Masque.masqueName = json["name"].ToString();
+                    Masque.masqueAccountAddress = accountAddress;
                     //Masque.masqueAccountAddress = accountAddress;
                     Masque.masqueId = masqueId;
-                    yield return IEGetMasqueId(masqueId,() => onComplete(token),onError);
+                    //yield return IEGetMasqueId(masqueId,() => onComplete(token),onError);
+                    onComplete.Invoke(token);
 
-                   
                     // Citizen.isConnect = true;
                     // loginShowIDScript.ClickButtonByMasqueId();
                 }
