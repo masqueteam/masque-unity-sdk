@@ -46,7 +46,7 @@ namespace MasqueSDK
 
                 if (webRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("Web Request Error: " + webRequest.error);
+                    Debug.Log("Web Request Error: " + webRequest.error);
                 }
                 else
                 {
