@@ -327,9 +327,12 @@ namespace MasqueSDK
             yield return null;
 
 
-            Vector3 headPos = headPoint.position;
-            headPos.y = animator.GetBoneTransform(HumanBodyBones.Head).position.y;
-            headPoint.position = headPos;
+            if (headPoint)
+            {
+                Vector3 headPos = headPoint.position;
+                headPos.y = animator.GetBoneTransform(HumanBodyBones.Head).position.y;
+                headPoint.position = headPos;
+            }
 
         }
         public Transform headPoint;
