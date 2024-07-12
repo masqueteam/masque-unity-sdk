@@ -1,18 +1,21 @@
-﻿using Newtonsoft.Json;
+﻿using GLTFast;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
-using GLTFast;
 
 namespace MasqueSDK
 {
     [RequireComponent(typeof(Animator))]
     public class MasqueAvatarLoader : MonoBehaviour
     {
+        static internal Dictionary<string, GltfImport> avatarTemp = new Dictionary<string, GltfImport>();
         public bool isLoadByLoginData = true;
         public string masqueAvatarUrl;
         public UnityEvent onLoading;
@@ -22,7 +25,7 @@ namespace MasqueSDK
 
         public enum Mode
         {
-            ShowSomeObject,HideSomeObject
+            ShowSomeObject, HideSomeObject
         }
         public Mode mode = Mode.ShowSomeObject;
         public GameObject[] selectObject;
@@ -45,12 +48,12 @@ namespace MasqueSDK
             //    LoadAvatar("https://models.readyplayer.me/63da89bc9b552e12bccafb58.glb");
         }
 
-        public void LoadAvatar(string url)
+        public void LoadAvatar(string url, bool isUseTemp = true)
         {
             onLoading?.Invoke();
-            masqueAvatarUrl = url;
             ClearChild();
-            GltfLoad(masqueAvatarUrl, transform);
+            masqueAvatarUrl = url;
+            GltfLoad(masqueAvatarUrl, transform, isUseTemp);
         }
 
         /*
@@ -87,40 +90,86 @@ namespace MasqueSDK
         }
         */
 
-        async void GltfLoad(string url, Transform parent)
-        {
-            var gltfImport = new GltfImport();
+        private CancellationTokenSource cancellationTokenSource;
 
+        async void GltfLoad(string url, Transform parent, bool isUseTemp)
+        {
+            cancellationTokenSource = new CancellationTokenSource();
+            GltfImport gltfImport = null;
+
+            if (avatarTemp.ContainsKey(url))
+            {
+                gltfImport = avatarTemp[url];
+            }
+            else
+            {
+                gltfImport = new GltfImport();
+                try
+                {
+                    avatarTemp[url] = gltfImport;  // เก็บ GltfImport ลงแคชเมื่อโหลดสำเร็จ
+                    await gltfImport.Load(url, null, cancellationTokenSource.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    Debug.Log($"Load glTF from URL {url} was canceled.");
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log($"Failed to load glTF from URL {url}. Error: {e.Message}");
+                    Failed();
+                    return;
+                }
+            }
+
+            InstantiationSettings setting = new InstantiationSettings
+            {
+                SceneObjectCreation = SceneObjectCreation.Always
+            };
+            var instantiator = new GameObjectInstantiator(gltfImport, parent, null, setting);
+
+            bool success;
             try
             {
-                await gltfImport.Load(url);
+                while (!gltfImport.LoadingDone)
+                    await Task.Yield();
+
+                success = await gltfImport.InstantiateMainSceneAsync(instantiator, cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log($"Instantiation of glTF from URL {url} was canceled.");
+                return;
             }
             catch (Exception e)
             {
-                Debug.Log($"Failed to load glTF from URL {url}. Error: {e.Message}");
+                Debug.Log($"Failed to instantiate glTF from URL {url}. Error: {e.Message}");
                 Failed();
                 return;
             }
 
-            InstantiationSettings setting = new InstantiationSettings();
-            setting.SceneObjectCreation = SceneObjectCreation.Always;
-            var instantiator = new GameObjectInstantiator(gltfImport, parent, null, setting);
-
-            var success = await gltfImport.InstantiateMainSceneAsync(instantiator);
             if (success)
             {
                 if (model != null)
                     Destroy(model);
-                model = instantiator.SceneTransform.gameObject;
 
-                GenerateAnimator();
-                Complete();
+                model = instantiator.SceneTransform.gameObject;
+                StartCoroutine(GenerateAnimator());
             }
             else
             {
                 Failed();
             }
         }
+
+        private void OnDisable()
+        {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
+
         void Complete()
         {
             try
@@ -171,7 +220,9 @@ namespace MasqueSDK
             }
             */
 
-            if(mode== Mode.ShowSomeObject)
+
+
+            if (mode == Mode.ShowSomeObject)
             {
                 for (int i = 0; i < transform.childCount; i++)
                 {
@@ -189,10 +240,11 @@ namespace MasqueSDK
                     selectObject[i].SetActive(false);
                 }
             }
-            
+
         }
         GameObject model;
-        void GenerateAnimator()
+
+        IEnumerator GenerateAnimator()
         {
             Debug.Log("Start Generate :" + model.name);
             //model = transform.Find("Scene").gameObject;
@@ -207,17 +259,17 @@ namespace MasqueSDK
             if (masqueAvatarUrl.Contains("https://masque-lab.adldigitalservice.com") || masqueAvatarUrl.Contains("https://masque-dev.adldigitalservice.com") || masqueAvatarUrl.Contains("https://masque-iot.adldigitalservice.com"))
             {
                 if (model.transform.Find("bone_masque0_root/hips_ARI"))
-                    SetupAnimator("Avatars/MasqueAvatar_ARI");
+                    yield return SetupAnimator("Avatars/MasqueAvatar_ARI");
                 else if (model.transform.Find("bone_masque0_root/hips_ARI_M"))
-                    SetupAnimator("Avatars/MasqueAvatar_ARI_M");
+                    yield return SetupAnimator("Avatars/MasqueAvatar_ARI_M");
                 else if (model.transform.Find("bone_masque0_root/hips/spine.001") || model.transform.Find("amature_masque0/hips/spine.001"))
-                    SetupAnimator("Avatars/MasqueAvatar_CU");
+                    yield return SetupAnimator("Avatars/MasqueAvatar_CU");
                 else if (model.transform.Find("bone_masque0_root/mixamorig:Hips"))
-                    SetupAnimator("Avatars/MasqueAvatar_Demo");
+                    yield return SetupAnimator("Avatars/MasqueAvatar_Demo");
                 else if (model.transform.Find("bone_masque0_root/hips/spine/chest"))
-                    SetupAnimator("Avatars/MasqueAvatar_Stranded");
+                    yield return SetupAnimator("Avatars/MasqueAvatar_Stranded");
                 else
-                    SetupAnimator("Avatars/MasqueAvatar_NewCollection01");
+                    yield return SetupAnimator("Avatars/MasqueAvatar_NewCollection01");
             }
             /*
             if (masqueAvatarUrl.Contains("http://20.212.54.87:4006/public/3D/masque-gltf/") || masqueAvatarUrl.Contains("https://masque-dev.adldigitalservice.com"))
@@ -235,17 +287,23 @@ namespace MasqueSDK
                 //model.SetActive(false);
                 model.transform.localScale = Vector3.one * 0.8f;
                 string jsonUrl = masqueAvatarUrl.Replace("glb", "json");
-                StartCoroutine(DownloadMetaData(jsonUrl));
+                yield return DownloadMetaData(jsonUrl);
             }
 
+
+            Complete();
         }
 
-        void SetupAnimator(string avatarPath)
+        IEnumerator SetupAnimator(string avatarPath)
         {
-            
+
+
             Avatar animationAvatar = Resources.Load<Avatar>(avatarPath);
             Debug.Log(animationAvatar.name);
             Animator animator = GetComponent<Animator>();
+
+            Transform rootBone = animator.GetBoneTransform(HumanBodyBones.Hips);
+            rootBone.name = "hide_root_bone";
 
             //animator.runtimeAnimatorController = animatorController;
             animator.avatar = animationAvatar;
@@ -258,9 +316,24 @@ namespace MasqueSDK
 
             //if (sourceGameObject)
             //    sourceGameObject.SetActive(false);
-            StartCoroutine(Reload(animator));
-        }
+            //StartCoroutine(Reload(animator));
 
+            model.SetActive(false);
+            yield return null;
+
+            animator.Rebind();
+
+            model.SetActive(true);
+            yield return null;
+
+
+            Vector3 headPos = headPoint.position;
+            headPos.y = animator.GetBoneTransform(HumanBodyBones.Head).position.y;
+            headPoint.position = headPos;
+
+        }
+        public Transform headPoint;
+        /*
         IEnumerator Reload(Animator animator)
         {
             model.SetActive(false);
@@ -268,6 +341,7 @@ namespace MasqueSDK
             animator.Rebind();
             model.SetActive(true);
         }
+        */
         public IEnumerator DownloadMetaData(string url)
         {
             using (var request = UnityWebRequest.Get(url))

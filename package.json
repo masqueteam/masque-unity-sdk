@@ -1,6 +1,6 @@
 {
   "name": "com.masque.masquesdk",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "displayName": "MasqueSDK",
   "description": "Here is the Unity's Software Development Kit, there is the avatar system APIs wrapper and providing the game's utilities.",
   "unity": "2020.1",
